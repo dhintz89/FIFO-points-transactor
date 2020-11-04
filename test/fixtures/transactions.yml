@@ -1,11 +1,13 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  user: one
-  payer_name: MyString
-  points: 1
+  user: valid_user
+  payer_name: DANNON
+  points: 300
+  created_at: DateTime.parse('2020-11-03 21:33:46')
 
 two:
-  user: two
-  payer_name: MyString
-  points: 1
+  user: valid_user
+  payer_name: UNILEVER
+  points: 200
+  created_at: DateTime.parse('2020-11-03 23:33:46')
