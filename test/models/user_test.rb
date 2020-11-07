@@ -26,6 +26,12 @@ class UserTest < ActiveSupport::TestCase
     assert_not user.save
   end
 
+  # test "user can log in with credentials" do
+  #   users = [User.new(email: "test@example.com", password: "password")]
+  #   user = users.find{|u| u.email == "test@example.com"}
+  #   assert_equal user.password, "password"
+  # end
+
   test "should create JWT" do
     user = users(:valid_user)
     user.id = 1

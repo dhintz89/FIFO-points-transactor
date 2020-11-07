@@ -1,4 +1,7 @@
 class TransactionSerializer < ActiveModel::Serializer
-  attributes :id, :payer_name, :points, :created_at, :user_id
-  has_one :user
+  attributes :payer_name, :points
+
+  def points
+    object.points.to_s + " points"
+  end
 end

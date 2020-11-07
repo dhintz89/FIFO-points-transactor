@@ -14,4 +14,8 @@ class User < ApplicationRecord
     self.transactions.map{|tran| tran.points}.reduce(:+)
   end
 
+  def payer_points_subtotal(payer_name)
+    self.transactions.filter{|tran| tran.payer_name == payer_name}.map{|tran| tran.points}.reduce(:+)
+  end
+
 end

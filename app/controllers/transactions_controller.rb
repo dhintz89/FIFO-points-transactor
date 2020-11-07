@@ -1,46 +1,70 @@
-# To facilitate transactions, no login is required as these are not user actions.
-  # Assumes security and authorization is handled by integrated system.
-  #   Ex. System calls add_points(recipient, payer, points), not a user
+# Facilitating transactions is not a user action, but is meant for admins/agents. Thus the user's account is denoted via URL.
+  # Assumes security and admin authorization handled by integrated system.
+  #   Ex. System calls user/1/add_points(payer, points) to add points to user1's account, user1 wouldn't have access for this action.
   # Reason: a user shouldn't be able to call add_points for themselves if points are coming from another account.
 
 class TransactionsController < ApplicationController
   before_action :authenticate_user!
 
-  # index
+  # index view of a user's transactions
   def points_balance
     user = User.find(params[:user_id])
-    transactions = user.transactions.all.sort_by{ |obj| obj.created_at }
-    render json: transactions.to_json
+    transactions = Transaction.sort_user_transactions(params[:user_id]) # sort by created_date
+    transactions.size > 0 ? (render json: transactions, each_Serializer: TransactionSerializer) : (render json: transactions.to_json)
   end
 
-  # create
+
+  # creates a new transaction associated to user_id in URL
   def add_points
     user = User.find(params[:user_id])
-    if transaction_params[:points] < 0
-      # remove points
-    else
+
+    if transaction_params[:points] < 0  # This is for negative additions - possible input per instructions
+      puts "In remove track"
+      payer_balance = user.payer_points_subtotal(transaction_params[:payer_name])
+      points_to_deduct = transaction_params[:points] * -1
+      puts "payer_balance: #{payer_balance}, deductions: #{points_to_deduct}"
+      #  Do not deduct more points than user's total payer sub-balance
+      if payer_balance - points_to_deduct < 0  # must be enough points from given payer in the account
+        render json: {error: "Can't deduct more than user's total payer sub-balance"}, status: :not_acceptable
+      else
+        removed_transactions = Transaction.deduct_points(user.id, points_to_deduct, transaction_params[:payer_name])
+        removed_transactions > 0 ? (render json: removed_transactions, each_serializer: RemovedTransactionSerializer) : (render json: removed_transactions.to_json)
+      end
+    else  #  Positive additions - usual use case
       transaction = user.transactions.new(transaction_params)
       if transaction.valid?
         transaction.save
-        render json: transaction.to_json
+        render json: transaction, serializer: TransactionShowSerializer
       else
         render json: {errors: transaction.errors}, status: :bad_request
       end
     end
   end
 
-  def deduct_points
 
+  def deduct_points
+    user = User.find(params[:user_id])
+    points_to_deduct = transaction_params[:points]
+
+    # Do not deduct more points than user's total balance
+    if user.total_points - points_to_deduct < 0
+      render json: {error: "Can't deduct more than user's total balance"}, status: :not_acceptable
+    else   
+      removed_transactions = Transaction.deduct_points(user.id, points_to_deduct)
+      removed_transactions > 0 ? (render json: removed_transactions, each_serializer: RemovedTransactionSerializer) : (render json: removed_transactions.to_json)
+    end
   end
+
 
   def destroy
     transaction = Transaction.find(params[:id])
     transaction.destroy
-    render json: transaction.to_json
+    render json: transaction, serializer: TransactionShowSerializer
   end
 
+
   def show
-    render json: Transaction.find(params[:id]).to_json
+    render json: Transaction.find(params[:id]), serializer: TransactionShowSerializer
   end
 
   private
