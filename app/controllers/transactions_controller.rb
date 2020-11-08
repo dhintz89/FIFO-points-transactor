@@ -19,10 +19,8 @@ class TransactionsController < ApplicationController
     user = User.find(params[:user_id])
 
     if transaction_params[:points] < 0  # This is for negative additions - possible input per instructions
-      puts "In remove track"
       payer_balance = user.payer_points_subtotal(transaction_params[:payer_name])
       points_to_deduct = transaction_params[:points] * -1
-      puts "payer_balance: #{payer_balance}, deductions: #{points_to_deduct}"
       #  Do not deduct more points than user's total payer sub-balance
       if payer_balance - points_to_deduct < 0  # must be enough points from given payer in the account
         render json: {error: "Can't deduct more than user's total payer sub-balance"}, status: :not_acceptable
@@ -30,6 +28,7 @@ class TransactionsController < ApplicationController
         removed_transactions = Transaction.deduct_points(user.id, points_to_deduct, transaction_params[:payer_name])
         removed_transactions > 0 ? (render json: removed_transactions, each_serializer: RemovedTransactionSerializer) : (render json: removed_transactions.to_json)
       end
+      
     else  #  Positive additions - usual use case
       transaction = user.transactions.new(transaction_params)
       if transaction.valid?

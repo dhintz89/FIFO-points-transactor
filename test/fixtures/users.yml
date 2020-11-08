@@ -7,4 +7,4 @@
 
 valid_user: 
   email: test1@example.com
-  encrypted_password: BCrypt::Password.create('password')
+  encrypted_password: $2a$12$eCnJ5WeFn/v9P.uYbpi3F.poYN8ZN9DMZ1uuddBrioJRb88uHArzi

@@ -1,6 +1,7 @@
 class Transaction < ApplicationRecord
   belongs_to :user
   alias_attribute :recipient_id, :user_id
+  validates :payer_name, :points, presence: true, allow_nil: false
 
   # retreives all transactions associated to provided user, and if payer_name is provided, filters for matches
   def self.sort_user_transactions(user_id, payer_name = '*')
@@ -14,11 +15,9 @@ class Transaction < ApplicationRecord
 
   def self.deduct_points(user_id, points_to_deduct, payer_name = '*')
     #  get list of in-scope transactions
-    puts "payer_name: #{payer_name}"
     if payer_name == '*'
       transaction_list = Transaction.sort_user_transactions(user_id)
     else
-      puts "in payer_name track"
       transaction_list = Transaction.sort_user_transactions(user_id, payer_name)
     end
 
