@@ -7,6 +7,7 @@ Rails.application.routes.draw do
       resources :transactions, except: [:create, :index] do
         collection do
           get 'points_balance'
+          get 'view_log'
           post 'add_points'
           post 'deduct_points'
         end

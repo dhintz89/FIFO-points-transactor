@@ -11,11 +11,11 @@ class User < ApplicationRecord
 
   # When a user sees their balance, they only see their full points balance, not where the points came from
   def total_points
-    self.transactions.map{|tran| tran.points}.reduce(:+)
+    self.transactions.map{|tran| tran.original_points}.reduce(:+)
   end
 
   def payer_points_subtotal(payer_name)
-    self.transactions.filter{|tran| tran.payer_name == payer_name}.map{|tran| tran.points}.reduce(:+)
+    self.transactions.filter{|tran| tran.payer_name == payer_name}.map{|tran| tran.original_points}.reduce(:+)
   end
 
 end

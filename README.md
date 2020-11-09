@@ -75,7 +75,13 @@ Use to see how many points are currently in a user's account, organized by payer
 * Request: `GET localhost:3000/users/<:user_id>/transactions/points_balance`
   * Body: N/A
   * Headers: `Authorization: Bearer <String>`
-* Expected Response: `{ "transactions": [ {"payer_name": <String>, "points": <String>}, {"payer_name": <String>, "points": <String>} ] }`
+* Expected Response: `{ "transactions": [ {"payer_name": <String>, "points": <String>}, {"payer_name": <String>, "points": <String>},... ] }`
+###### View full transaction log
+Use to see full list of transactions, including zeroed-out and negative, organized by ascending created date.
+* Request: `GET localhost:3000/users/<:user_id>/transactions/view_log`
+  * Body: N/A
+  * Headers: `Authorization: Bearer <String>`
+* Expected Response: `{ "transactions": [ {"id": <Integer>, "user_id":<Integer>, "payer_name": <String>, "points": <String>, "original_points":<Integer>, "created_at":<DateTime>}, {"id": <Integer>, "user_id":<Integer>, "payer_name": <String>, "points": <String>, "original_points":<Integer>, "created_at":<DateTime>},... ] }`
 ###### Add points to a user
 Use to add points to a user.
 *Note: adding negative points performs the same action as using the deduct points endpoint, except only transactions for a single payer will be processed.*
@@ -88,17 +94,17 @@ Use to view full details of a singe transaction.
 * Request: `GET localhost:3000/users/<:user_id>/transactions/<:id>`
   * Body: N/A
   * Headers: `Authorization: Bearer <String>`
-* Expected Response: `{ "transaction": { "id": <Integer>, "user_id": <Integer>, "payer_name":<String>, "points": <Integer>, "created_at": <DateTime> } }`
+* Expected Response: `{ "transaction": { "id": <Integer>, "user_id": <Integer>, "payer_name":<String>, "points": <Integer>, "original_points":<Integer>, "created_at": <DateTime> } }`
 ###### Deduct Points from a user 
 Use to deduct points from a user.  Points will be removed order-by-order in first-in/first-out order.  Returns removed points.
 * Request: `POST localhost:3000/users/<:user_id>/transactions/deduct_points`
   * Body: `{ "transaction": { "points": <Integer> } }`
   * Headers: `Authorization: Bearer <String>`
-* Expected Response: `{ "transactions": [ {"payer_name": <String>, "points": <String>, "updated_at": <DateTime>}, {"payer_name": <String>, "points": <String>, "updated_at": <DateTime>} ] }`
+* Expected Response: `{ "transactions": [ {"payer_name": <String>, "points": <String>, "updated_at": <DateTime>}, {"payer_name": <String>, "points": <String>, "updated_at": <DateTime>},... ] }`
 ###### Delete a specific transaction
 Use to delete (cancel) a transaction - Deduct Points endpoint should be used for removing valid points.
 * Request: `DELETE localhost:3000/users/<:user_id>/transactions/<:id>`
   * Body: N/A
   * Headers: `Authorization: Bearer <String>`
-* Expected Response: `{ "transaction": { "id": <Integer>, "user_id": <Integer>, "payer_name": <String>, "points": <String>, "created_at": <DateTime> } }`
+* Expected Response: `{ "transaction": { "id": <Integer>, "user_id": <Integer>, "payer_name": <String>, "points": <String>, "original_points":<Integer>, "created_at": <DateTime> } }`
 

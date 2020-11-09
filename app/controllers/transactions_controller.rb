@@ -5,6 +5,12 @@
 class TransactionsController < ApplicationController
   before_action :authenticate_user!
 
+  # view details for all of user's transactions
+  def view_log
+    transactions = Transaction.sort_user_transactions(params[:user_id]) # sort by created_date
+    render json: transactions, each_serializer: TransactionShowSerializer
+  end
+  
   # rollup view of all user's current points by payer
   def points_balance
     user = User.find(params[:user_id])
@@ -14,9 +20,9 @@ class TransactionsController < ApplicationController
     transactions.each do |t|
       payer = payers.find{|p| p[:payer_name] == t.payer_name}
       if payer
-        payer[:points] = payer[:points] + t.points
+        payer[:points] = payer[:points] + t.original_points
       else
-        entry = {payer_name: t.payer_name, points: t.points}
+        entry = {payer_name: t.payer_name, points: t.original_points}
         payers << entry
       end
     end
@@ -41,7 +47,7 @@ class TransactionsController < ApplicationController
       end
 
     else  #  Positive additions - usual use case
-      transaction = user.transactions.new(transaction_params)
+      transaction = user.transactions.new(payer_name: transaction_params[:payer_name], points: transaction_params[:points], original_points: transaction_params[:points])
       if transaction.valid?
         transaction.save
         render json: transaction, serializer: TransactionShowSerializer

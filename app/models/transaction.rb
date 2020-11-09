@@ -29,17 +29,19 @@ class Transaction < ApplicationRecord
     # NON-DESTRUCTIVE APPROACH (KEEPS RECORD OF ALL TRANSACTIONS, CREATES -TRANSACTION RATHER THAN ZEROING OUT EXISTING)
     while points_to_deduct > 0 do  # move through sorted transactions list from earliest to most recent (using i)
       processing_transaction = transaction_list[i]
-      if !processing_transaction.points < 0  # skip any transactions with negative values (deductions)
+      unless processing_transaction.points < 0  # skip any transactions with negative values (deductions)
         if points_to_deduct - processing_transaction.points >= 0  # if there are remaining points in existing transaction record, need to modify record, not destroy
-          neg_transaction = user.transactions.create(payer_name: processing_transaction.payer_name, points: processing_transaction.points * -1)  # change from points owned to points removed
+          neg_transaction = user.transactions.create(payer_name: processing_transaction.payer_name, points: processing_transaction.points * -1, original_points: processing_transaction.points * -1)  # change from points owned to points removed
+          processing_transaction.update(points: 0)
         else
-          neg_transaction = user.transactions.create(payer_name: processing_transaction.payer_name, points: points_to_deduct * -1)
+          neg_transaction = user.transactions.create(payer_name: processing_transaction.payer_name, points: points_to_deduct * -1, original_points: points_to_deduct * -1)
+          processing_transaction.update(points: processing_transaction.points - points_to_deduct)
         end
         removed_points << neg_transaction
 
         points_to_deduct += neg_transaction.points
-        i += 1
       end
+      i += 1
     end
 
       #  return the removed points for app logging

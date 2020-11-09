@@ -4,22 +4,26 @@ one:
   user: valid_user
   payer_name: DANNON
   points: 300
+  original_points: 300
   created_at: DateTime.parse('2020-11-03 21:33:46')
 
 two:
   user: valid_user
   payer_name: UNILEVER
   points: 200
+  original_points: 200
   created_at: DateTime.parse('2020-11-03 23:33:46')
 
 three:
   user: user_two
   payer_name: DANNON
   points: 500
+  original_points: 500
   created_at: DateTime.parse('2020-11-05 23:33:46')
 
 four:
   user: valid_user
   payer_name: DANNON
   points: 500
+  original_points: 500
   created_at: DateTime.parse('2020-11-06 23:33:46')

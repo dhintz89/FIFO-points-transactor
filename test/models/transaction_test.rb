@@ -48,9 +48,8 @@ class TransactionTest < ActiveSupport::TestCase
   end
 
   test "deduct_points processes transactions in First-In-First-Out order (all payers)" do
-    removed_transactions = Transaction.deduct_points(@user.id, 600)
     list = Transaction.sort_user_transactions(@user.id)
-    list.first.points * -1
+    removed_transactions = Transaction.deduct_points(@user.id, 600)
     assert_equal list.first.payer_name, removed_transactions.first.payer_name
     assert_equal list.first.points, removed_transactions.first.points * -1
   end
@@ -67,9 +66,8 @@ class TransactionTest < ActiveSupport::TestCase
   end
 
   test "deduct_points processes transactions in First-In-First-Out order (payer specified)" do
-    removed_transactions = Transaction.deduct_points(@user.id, 200, "UNILEVER")
     list = Transaction.sort_user_transactions(@user.id, "UNILEVER")
-    list.first.points * -1
+    removed_transactions = Transaction.deduct_points(@user.id, 200, "UNILEVER")
     assert_equal list.first.payer_name, removed_transactions.first.payer_name
     assert_equal list.first.points, removed_transactions.first.points * -1
   end
