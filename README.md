@@ -6,27 +6,27 @@
 
 
 ## Steps to setup locally
-1. Fork and Clone repository from Github
+1. Fork and Clone repository from Github<br/>
 `git clone git@github.com:[your-username]/fetch-backend-coding-challenge.git`
 
-2. Install dependencies using Bundle
+2. Install dependencies using Bundle<br/>
 `bundle install`
 
-3. Create database from config/database.yml (SQLite3)
+3. Create database from config/database.yml (SQLite3)<br/>
 `rake db:create`
 
-4. Initialize
+4. Initialize<br/>
 `rake db:schema:load`<br/>
 *If this doesn't work for any reason, run `rake db:migrate` instead to build from migration files*
 
-5. Seed database
-`rails db:seed`
+5. Seed database<br/>
+`rails db:seed`<br/>
 *This will create a dummy user for authentication and db association purposes, as well as several transactions for integration testing*
 
-6. Need to reset the data in the database?
+6. Need to reset the data in the database?<br/>
 `rake db:reset`  (db will reset and be re-seeded)
 
-7. Need to entirely drop the database and start over?
+7. Need to entirely drop the database and start over?<br/>
 `rake db:drop`  (db will be destroyed)
 
 
@@ -35,18 +35,18 @@ There are model tests included in test/models.  These will test:
 * User can be properly created and authenticated and can properly calculate the points totals.
 * Transaction can be properly created, viewed, and deducted
 
-Run all tests using `rails test` 
+Run all tests using `rails test`<br/>
 Or Run individual model tests using `rails test test/transaction_test.rb` or `rails test test/user_test.rb`
 
 
 ## Starting Server
 * Run `rails s` after all setup is complete to startup development server
-* Site is now running on localhost:3000
+* Site is now running on localhost:3000<br/>
 *Note: This is not setup to run in the browser, it will respond to HTTP Requests with JSON Responses.*
 
 ## Available HTTP Endpoints
-Site will respond to the following HTTP Requests (recommend using [Postman](https://www.postman.com/downloads/) to make calls)
-[![Run in Postman](https://run.pstmn.io/button.svg)](https://god.postman.co/run-collection/c379b625d44266b22487)
+Site will respond to the following HTTP Requests (recommend using [Postman](https://www.postman.com/downloads/) to make calls)<br/>
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://god.postman.co/run-collection/c379b625d44266b22487)<br/>
 Note: Default Auth Token present in Postman Workspace corresponds to first user after **database is seeded**.  If you prefer to create a new user instead, make sure to change the token in the Authorization Headers to the value returned upon successful Registration.
 
 #### Frontend User Paths
@@ -67,6 +67,7 @@ A signed-in user can use this endpoint to view their own account details, as wel
   * Body: N/A
   * Headers: `Authorization: Bearer <token>`
 * Expected Response: `{ "user": { "id": <Integer>, "email": <String>, "total_points": <String> } }`
+<br/>
 
 #### Backend User/Agent Paths
 
