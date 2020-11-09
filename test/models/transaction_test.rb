@@ -41,15 +41,18 @@ class TransactionTest < ActiveSupport::TestCase
     assert_not trans.save, "transaction cannot be created without specifying points"
   end
 
-  test "deduct_points deletes transactions when their balance hits 0 (all payers)" do
+  test "deduct_points creates a new transaction with points inversed for each transaction processed (all payers)" do
     Transaction.deduct_points(@user.id, 600)
     list = Transaction.sort_user_transactions(@user.id)
-    assert_equal 1, list.size
+    assert_equal 6, list.size
   end
 
   test "deduct_points processes transactions in First-In-First-Out order (all payers)" do
     removed_transactions = Transaction.deduct_points(@user.id, 600)
-    assert_equal [980190962, 298486374, 281110143], removed_transactions.map{|t| t.id}
+    list = Transaction.sort_user_transactions(@user.id)
+    list.first.points * -1
+    assert_equal list.first.payer_name, removed_transactions.first.payer_name
+    assert_equal list.first.points, removed_transactions.first.points * -1
   end
 
   test "deduct_points deducts the correct number of points (all payers)" do
@@ -57,15 +60,18 @@ class TransactionTest < ActiveSupport::TestCase
     assert_equal 400, @user.total_points
   end
 
-  test "deduct_points deletes transactions when their balance hits 0 (payer specified)" do
-    Transaction.deduct_points(@user.id, 600, "DANNON")
-    list = Transaction.sort_user_transactions(@user.id, "DANNON")
-    assert_equal 1, list.size
+  test "deduct_points creates a new transaction with points inversed for each transaction processed (payer specified)" do
+    Transaction.deduct_points(@user.id, 200, "UNILEVER")
+    list = Transaction.sort_user_transactions(@user.id, "UNILEVER")
+    assert_equal 2, list.size
   end
 
   test "deduct_points processes transactions in First-In-First-Out order (payer specified)" do
-    removed_transactions = Transaction.deduct_points(@user.id, 600, "DANNON")
-    assert_equal [980190962, 281110143], removed_transactions.map{|t| t.id}
+    removed_transactions = Transaction.deduct_points(@user.id, 200, "UNILEVER")
+    list = Transaction.sort_user_transactions(@user.id, "UNILEVER")
+    list.first.points * -1
+    assert_equal list.first.payer_name, removed_transactions.first.payer_name
+    assert_equal list.first.points, removed_transactions.first.points * -1
   end
 
   test "deduct_points deducts the correct number of points (payer specified)" do

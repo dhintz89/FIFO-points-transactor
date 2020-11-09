@@ -1,18 +1,29 @@
 # Facilitating transactions is not a user action, but is meant for admins/agents. Thus the user's account is denoted via URL.
-  # Assumes security and admin authorization handled by integrated system.
-  #   Ex. System calls user/1/add_points(payer, points) to add points to user1's account, user1 wouldn't have access for this action.
+  # Ex. System calls user/1/add_points(payer, points) to add points to user1's account, user1 wouldn't have access for this action.
   # Reason: a user shouldn't be able to call add_points for themselves if points are coming from another account.
 
 class TransactionsController < ApplicationController
   before_action :authenticate_user!
 
-  # index view of a user's transactions
+  # rollup view of all user's current points by payer
   def points_balance
     user = User.find(params[:user_id])
     transactions = Transaction.sort_user_transactions(params[:user_id]) # sort by created_date
-    transactions.size > 0 ? (render json: transactions, each_Serializer: TransactionSerializer) : (render json: transactions.to_json)
-  end
+    payers = []
 
+    transactions.each do |t|
+      payer = payers.find{|p| p[:payer_name] == t.payer_name}
+      if payer
+        payer[:points] = payer[:points] + t.points
+      else
+        entry = {payer_name: t.payer_name, points: t.points}
+        payers << entry
+      end
+    end
+    payers.each {|p| p[:points] = p[:points].to_s + " points"}
+
+    render json: payers
+  end
 
   # creates a new transaction associated to user_id in URL
   def add_points
@@ -25,10 +36,10 @@ class TransactionsController < ApplicationController
       if payer_balance - points_to_deduct < 0  # must be enough points from given payer in the account
         render json: {error: "Can't deduct more than user's total payer sub-balance"}, status: :not_acceptable
       else
-        removed_transactions = Transaction.deduct_points(user.id, points_to_deduct, transaction_params[:payer_name])
-        removed_transactions > 0 ? (render json: removed_transactions, each_serializer: RemovedTransactionSerializer) : (render json: removed_transactions.to_json)
+        removed_points = Transaction.deduct_points(user.id, points_to_deduct, transaction_params[:payer_name])
+        removed_points.size > 0 ? (render json: removed_points, each_serializer: RemovedTransactionSerializer) : (render json: removed_transactions.to_json)
       end
-      
+
     else  #  Positive additions - usual use case
       transaction = user.transactions.new(transaction_params)
       if transaction.valid?
@@ -49,8 +60,8 @@ class TransactionsController < ApplicationController
     if user.total_points - points_to_deduct < 0
       render json: {error: "Can't deduct more than user's total balance"}, status: :not_acceptable
     else   
-      removed_transactions = Transaction.deduct_points(user.id, points_to_deduct)
-      removed_transactions > 0 ? (render json: removed_transactions, each_serializer: RemovedTransactionSerializer) : (render json: removed_transactions.to_json)
+      removed_points = Transaction.deduct_points(user.id, points_to_deduct)
+      removed_points.size > 0 ? (render json: removed_points, each_serializer: RemovedTransactionSerializer) : (render json: removed_transactions.to_json)
     end
   end
 

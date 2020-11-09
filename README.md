@@ -38,6 +38,7 @@ There are model tests included in test/models.  These will test:
 Run all tests using `rails test` 
 Or Run individual model tests using `rails test test/transaction_test.rb` or `rails test test/user_test.rb`
 
+
 ## Starting Server
 * Run `rails s` after all setup is complete to startup development server
 * Site is now running on localhost:3000
@@ -45,6 +46,8 @@ Or Run individual model tests using `rails test test/transaction_test.rb` or `ra
 
 ## Available HTTP Endpoints
 Site will respond to the following HTTP Requests (recommend using [Postman](https://www.postman.com/downloads/) to make calls)
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://god.postman.co/run-collection/c379b625d44266b22487)
+Note: Default Auth Token present in Postman Workspace corresponds to first user after **database is seeded**.  If you prefer to create a new user instead, make sure to change the token in the Authorization Headers to the value returned upon successful Registration.
 
 #### Frontend User Paths
 
