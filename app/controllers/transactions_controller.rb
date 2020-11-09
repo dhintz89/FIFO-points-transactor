@@ -19,14 +19,14 @@ class TransactionsController < ApplicationController
 
     transactions.each do |t|
       payer = payers.find{|p| p[:payer_name] == t.payer_name}
-      if payer
-        payer[:points] = payer[:points] + t.original_points
+      if payer  #  if payer already exists in array
+        payer[:points] = payer[:points] + t.original_points  #  add new points to existing balance
       else
-        entry = {payer_name: t.payer_name, points: t.original_points}
+        entry = {payer_name: t.payer_name, points: t.original_points}  #  create a new payer entry and add to array
         payers << entry
       end
     end
-    payers.each {|p| p[:points] = p[:points].to_s + " points"}
+    payers.each {|p| p[:points] = p[:points].to_s + " points"}  #  convert to "100 points" format
 
     render json: payers
   end

@@ -30,24 +30,25 @@ class Transaction < ApplicationRecord
     while points_to_deduct > 0 do  # move through sorted transactions list from earliest to most recent (using i)
       processing_transaction = transaction_list[i]
       unless processing_transaction.points < 0  # skip any transactions with negative values (deductions)
-        if points_to_deduct - processing_transaction.points >= 0  # if there are remaining points in existing transaction record, need to modify record, not destroy
+        if points_to_deduct - processing_transaction.points >= 0  # if there will be points remaining in processing_transaction
+          # Create negative transaction denoting points removed
           neg_transaction = user.transactions.create(payer_name: processing_transaction.payer_name, points: processing_transaction.points * -1, original_points: processing_transaction.points * -1)  # change from points owned to points removed
-          processing_transaction.update(points: 0)
+          processing_transaction.update(points: 0)  #  zero out processing_transaction
         else
+          # Create negative transaction denoting points removed
           neg_transaction = user.transactions.create(payer_name: processing_transaction.payer_name, points: points_to_deduct * -1, original_points: points_to_deduct * -1)
-          processing_transaction.update(points: processing_transaction.points - points_to_deduct)
+          processing_transaction.update(points: processing_transaction.points - points_to_deduct)  # remove points from processing_transaction's total
         end
         removed_points << neg_transaction
 
         points_to_deduct += neg_transaction.points
-      end
+      end  # end unless
       i += 1
-    end
+    end  # end while loop
 
-      #  return the removed points for app logging
+    #  return the removed points for app logging
     return removed_points
   end
-
 end
 
 # DESTRUCTIVE DEDUCT WHILELOOP APPROACH (DELETES ZERO'D OUT TRANSACTIONS TO SAVE MEMORY)
