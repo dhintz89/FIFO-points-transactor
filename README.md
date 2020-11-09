@@ -16,7 +16,7 @@
 `rake db:create`
 
 4. Initialize
-`rake db:schema:load`
+`rake db:schema:load`<br/>
 *If this doesn't work for any reason, run `rake db:migrate` instead to build from migration files*
 
 5. Seed database
